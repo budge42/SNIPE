@@ -13,7 +13,7 @@
             background-color: #f4f7fa;
         }
         .container {
-            width: 50%;
+            max-width: 900px;
             margin: 50px auto;
             background: #fff;
             padding: 30px;
@@ -65,11 +65,27 @@
         .result {
             margin-top: 30px;
             padding: 20px;
-            background-color: #e9f7fe;
-            border-left: 4px solid #007bff;
+            background-color: #f1f9ff;
+            border-left: 6px solid #007bff;
             border-radius: 8px;
             white-space: pre-wrap;
             font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .result h3 {
+            font-size: 22px;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        .result pre {
+            white-space: pre-wrap; /* This ensures the content wraps within its container */
+            word-wrap: break-word; /* This ensures long words break properly */
+            background-color: #eef6fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto; /* In case there are extremely long lines, it will allow horizontal scroll */
         }
         .spinner {
             display: none;
@@ -136,7 +152,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    resultHTML += `<h3 style="font-weight:600;color:#007bff;">${section}</h3><pre>${result.stories}</pre>`;
+                    resultHTML += `<h3>${section.charAt(0).toUpperCase() + section.slice(1)}</h3><pre>${result.stories}</pre>`;
                     document.getElementById('result').innerHTML = resultHTML;
                 } else {
                     const error = await response.json();
