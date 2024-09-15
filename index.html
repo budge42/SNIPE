@@ -73,8 +73,6 @@
             <label for="integration">Do you have any existing systems or tools to integrate?</label>
             <textarea id="integration" name="integration"></textarea>
             
-            <!-- Add more questions similarly -->
-            
             <button type="submit">Generate User Stories</button>
         </form>
 
@@ -106,7 +104,8 @@
                     const result = await response.json();
                     document.getElementById('result').innerHTML = `<pre>${result.stories}</pre>`;
                 } else {
-                    document.getElementById('result').innerHTML = 'Error generating stories.';
+                    const error = await response.json();
+                    document.getElementById('result').innerHTML = `Error: ${error.error}`;
                 }
             } catch (error) {
                 document.getElementById('result').innerHTML = 'Error connecting to the server.';
