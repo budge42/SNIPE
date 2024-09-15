@@ -83,32 +83,35 @@
         document.getElementById('csmForm').addEventListener('submit', async function(event) {
             event.preventDefault();
 
-            // Gather form data
             const formData = new FormData(event.target);
             const formObject = Object.fromEntries(formData.entries());
 
-            // Display loading message
-            document.getElementById('result').innerHTML = 'Generating user stories and acceptance criteria...';
+            const sections = ['goal', 'teams', 'issues', 'integration'];
+            let resultHTML = '';
 
-            // Send data to the backend
-            try {
+            // Function to send the request for each section
+            const generateStoriesForSection = async (section) => {
                 const response = await fetch('/api/generate-stories', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(formObject),
+                    body: JSON.stringify({ ...formObject, question: section }),
                 });
 
                 if (response.ok) {
                     const result = await response.json();
-                    document.getElementById('result').innerHTML = `<pre>${result.stories}</pre>`;
+                    resultHTML += `<h3>${section}</h3><pre>${result.stories}</pre>`;
+                    document.getElementById('result').innerHTML = resultHTML;
                 } else {
                     const error = await response.json();
                     document.getElementById('result').innerHTML = `Error: ${error.error}`;
                 }
-            } catch (error) {
-                document.getElementById('result').innerHTML = 'Error connecting to the server.';
+            };
+
+            // Generate stories for each section
+            for (const section of sections) {
+                await generateStoriesForSection(section);
             }
         });
     </script>
