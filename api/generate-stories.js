@@ -31,7 +31,7 @@ async function generateUserStories(question, content) {
         return completion.data.choices[0].message.content;
     } catch (error) {
         console.error("OpenAI API error:", error.response ? error.response.data : error.message);
-        throw new Error("Error generating user stories.");
+        throw new Error(`Error generating user stories: ${error.response?.data || error.message}`);
     }
 }
 
@@ -53,7 +53,7 @@ export default async function handler(req, res) {
 
             res.status(200).json({ stories: generatedStories });
         } catch (error) {
-            res.status(500).json({ error: "Error generating stories." });
+            res.status(500).json({ error: `Error generating stories: ${error.message}` });
         }
     } else {
         res.status(405).json({ message: "Method not allowed" });
