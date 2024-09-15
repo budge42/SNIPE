@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "openai": "^3.0.0"
+    "openai": "^3.0.0",
+    "jspdf": "^2.5.1",
+    "docx": "^7.1.0"
   }
 }
