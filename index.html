@@ -46,9 +46,6 @@
         }
         form {
             margin-top: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
         label {
             display: block;
@@ -56,7 +53,7 @@
             font-weight: 500;
             color: #555;
         }
-        textarea, input {
+        textarea {
             width: 100%;
             padding: 15px;
             margin-bottom: 20px;
@@ -65,13 +62,14 @@
             font-size: 16px;
             transition: border-color 0.3s ease;
         }
-        textarea:focus, input:focus {
+        textarea:focus {
             border-color: #7d5ba6;
         }
         .action-buttons {
             display: flex;
             justify-content: flex-start;
             gap: 10px;
+            margin-top: 20px;
         }
         button {
             padding: 12px 20px;
@@ -162,8 +160,21 @@
         <!-- Title -->
         <h2>Customer Service Management (CSM) Questionnaire</h2>
 
-        <!-- Form with Generate and PDF Buttons -->
+        <!-- Form -->
         <form id="csmForm">
+            <label for="goal">What are the main goals for your CSM implementation?</label>
+            <textarea id="goal" name="goal" rows="4" required></textarea>
+
+            <label for="teams">Which departments or teams will be using CSM?</label>
+            <textarea id="teams" name="teams" rows="4" required></textarea>
+
+            <label for="issues">What are the most common customer issues or requests?</label>
+            <textarea id="issues" name="issues" rows="4" required></textarea>
+
+            <label for="integration">Do you have any existing systems or tools to integrate?</label>
+            <textarea id="integration" name="integration" rows="4"></textarea>
+
+            <!-- Action Buttons -->
             <div class="action-buttons">
                 <button type="submit">
                     <i class="fa fa-pencil"></i> Generate User Stories
