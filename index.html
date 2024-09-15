@@ -6,54 +6,78 @@
     <title>CSM Implementation Tool</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #f9f9f9;
         }
         .container {
-            width: 50%;
+            width: 60%;
             margin: 50px auto;
             background: #fff;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
         }
         h1 {
             text-align: center;
-        }
-        form {
-            margin-top: 20px;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
             margin-bottom: 10px;
             font-weight: bold;
+            font-size: 18px;
         }
-        input, select, textarea {
+        textarea, input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 20px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        textarea:focus, input:focus {
+            border-color: #007bff;
         }
         button {
             width: 100%;
-            padding: 10px;
-            background-color: #28a745;
+            padding: 12px;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
         .result {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 30px;
+            padding: 20px;
             background-color: #f0f8ff;
-            border-radius: 8px;
+            border-radius: 12px;
+            font-size: 16px;
+            white-space: pre-wrap;
+        }
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -62,19 +86,21 @@
         <h1>Customer Service Management (CSM) Questionnaire</h1>
         <form id="csmForm">
             <label for="goal">What are the main goals for your CSM implementation?</label>
-            <textarea id="goal" name="goal" required></textarea>
-            
+            <textarea id="goal" name="goal" rows="4" required></textarea>
+
             <label for="teams">Which departments or teams will be using CSM?</label>
-            <textarea id="teams" name="teams" required></textarea>
-            
+            <textarea id="teams" name="teams" rows="4" required></textarea>
+
             <label for="issues">What are the most common customer issues or requests?</label>
-            <textarea id="issues" name="issues" required></textarea>
-            
+            <textarea id="issues" name="issues" rows="4" required></textarea>
+
             <label for="integration">Do you have any existing systems or tools to integrate?</label>
-            <textarea id="integration" name="integration"></textarea>
-            
+            <textarea id="integration" name="integration" rows="4"></textarea>
+
             <button type="submit">Generate User Stories</button>
         </form>
+
+        <div class="spinner" id="loadingSpinner"></div>
 
         <div id="result" class="result"></div>
     </div>
@@ -86,32 +112,33 @@
             const formData = new FormData(event.target);
             const formObject = Object.fromEntries(formData.entries());
 
-            const sections = ['goal', 'teams', 'issues', 'integration'];
-            let resultHTML = '';
+            // Display loading spinner
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = 'block';
 
-            // Function to send the request for each section
-            const generateStoriesForSection = async (section) => {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+
+            try {
                 const response = await fetch('/api/generate-stories', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ ...formObject, question: section }),
+                    body: JSON.stringify(formObject),
                 });
 
                 if (response.ok) {
                     const result = await response.json();
-                    resultHTML += `<h3>${section}</h3><pre>${result.stories}</pre>`;
-                    document.getElementById('result').innerHTML = resultHTML;
+                    resultDiv.innerHTML = `<pre>${result.stories}</pre>`;
                 } else {
                     const error = await response.json();
-                    document.getElementById('result').innerHTML = `Error: ${error.error}`;
+                    resultDiv.innerHTML = `Error: ${error.error}`;
                 }
-            };
-
-            // Generate stories for each section
-            for (const section of sections) {
-                await generateStoriesForSection(section);
+            } catch (error) {
+                resultDiv.innerHTML = 'Error connecting to the server.';
+            } finally {
+                spinner.style.display = 'none';  // Hide spinner once the request is complete
             }
         });
     </script>
