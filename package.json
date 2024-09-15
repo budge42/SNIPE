@@ -1,0 +1,9 @@
+{
+  "name": "snipe",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "openai": "^3.0.0"  // Add the openai dependency here
+  }
+}
