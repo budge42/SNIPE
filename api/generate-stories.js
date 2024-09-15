@@ -5,26 +5,26 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-async function generateUserStories(question, content) {
+async function generateCohesiveUserStories(goal, teams, issues, integration) {
     const prompt = `
-    You are a ServiceNow CSM implementation expert. Based on the following client input, generate detailed user stories and acceptance criteria:
+    You are a ServiceNow CSM implementation expert. Based on the following inputs, generate detailed, cohesive user stories and acceptance criteria for a Customer Service Management project:
 
-    - ${question}: ${content}
+    - Goal of CSM implementation: ${goal}
+    - Departments or teams using CSM: ${teams}
+    - Common customer issues or requests: ${issues}
+    - Integration requirements: ${integration}
 
-    Generate user stories in this format:
-    - User Story 1:
-      - Description: [Story description]
-      - Acceptance Criteria:
-        - [Criteria 1]
-        - [Criteria 2]
+    Generate user stories that account for the full project scope, with each user story having:
+    - Description
+    - Acceptance Criteria (at least 2 per story)
 
-    Create at least 2 user stories with detailed acceptance criteria.`;
+    Create a cohesive plan of at least 4 user stories based on this input.`;
 
     try {
         const completion = await openai.createChatCompletion({
-            model: "gpt-4-turbo",  // Using gpt-4-turbo for faster responses
+            model: "gpt-4-turbo",
             messages: [{ role: "user", content: prompt }],
-            max_tokens: 500,
+            max_tokens: 1500,
             temperature: 0.7,
         });
 
@@ -37,20 +37,10 @@ async function generateUserStories(question, content) {
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
-        const { goal, teams, issues, integration, question } = req.body;
+        const { goal, teams, issues, integration } = req.body;
 
         try {
-            let generatedStories = "";
-            if (question === 'goal') {
-                generatedStories = await generateUserStories("Goal of CSM implementation", goal);
-            } else if (question === 'teams') {
-                generatedStories = await generateUserStories("Departments or teams using CSM", teams);
-            } else if (question === 'issues') {
-                generatedStories = await generateUserStories("Common customer issues or requests", issues);
-            } else if (question === 'integration') {
-                generatedStories = await generateUserStories("Integration requirements", integration);
-            }
-
+            const generatedStories = await generateCohesiveUserStories(goal, teams, issues, integration);
             res.status(200).json({ stories: generatedStories });
         } catch (error) {
             res.status(500).json({ error: "Error generating stories." });
