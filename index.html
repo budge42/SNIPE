@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S.N.I.P.E - ServiceNow Intelligent Project Engine</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -45,6 +46,9 @@
         }
         form {
             margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         label {
             display: block;
@@ -64,18 +68,17 @@
         textarea:focus, input:focus {
             border-color: #7d5ba6;
         }
-        .export-buttons {
+        .action-buttons {
             display: flex;
-            justify-content: center;
+            justify-content: flex-start;
             gap: 10px;
-            margin-top: 20px;
         }
-        .export-button {
-            padding: 10px;
-            font-size: 14px;
-            border: none;
+        button {
+            padding: 12px 20px;
             background-color: #7d5ba6;
             color: white;
+            font-size: 16px;
+            border: none;
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease;
@@ -83,10 +86,26 @@
             align-items: center;
             gap: 5px;
         }
-        .export-button i {
+        button:hover {
+            background-color: #5d3e91;
+        }
+        .pdf-button {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 12px 20px;
+            background-color: #7d5ba6;
+            color: white;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .pdf-button i {
             font-size: 16px;
         }
-        .export-button:hover {
+        .pdf-button:hover {
             background-color: #5d3e91;
         }
         .result {
@@ -143,21 +162,16 @@
         <!-- Title -->
         <h2>Customer Service Management (CSM) Questionnaire</h2>
 
-        <!-- Form -->
+        <!-- Form with Generate and PDF Buttons -->
         <form id="csmForm">
-            <label for="goal">What are the main goals for your CSM implementation?</label>
-            <textarea id="goal" name="goal" rows="4" required></textarea>
-
-            <label for="teams">Which departments or teams will be using CSM?</label>
-            <textarea id="teams" name="teams" rows="4" required></textarea>
-
-            <label for="issues">What are the most common customer issues or requests?</label>
-            <textarea id="issues" name="issues" rows="4" required></textarea>
-
-            <label for="integration">Do you have any existing systems or tools to integrate?</label>
-            <textarea id="integration" name="integration" rows="4"></textarea>
-
-            <button type="submit">Generate User Stories</button>
+            <div class="action-buttons">
+                <button type="submit">
+                    <i class="fa fa-pencil"></i> Generate User Stories
+                </button>
+                <button id="savePDF" class="pdf-button">
+                    <i class="fa fa-download"></i> Download PDF
+                </button>
+            </div>
         </form>
 
         <!-- Loading Spinner -->
@@ -165,20 +179,9 @@
 
         <!-- Result Section -->
         <div id="result" class="result"></div>
-
-        <!-- Export Buttons -->
-        <div class="export-buttons">
-            <button id="savePDF" class="export-button">
-                <i class="fa fa-file-pdf-o"></i> PDF
-            </button>
-            <button id="saveDOCX" class="export-button">
-                <i class="fa fa-file-word-o"></i> DOCX
-            </button>
-        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.1.0/docx.min.js"></script>
     <script>
         document.getElementById('csmForm').addEventListener('submit', async function(event) {
             event.preventDefault();
@@ -188,7 +191,7 @@
 
             const sections = ['goal', 'teams', 'issues', 'integration'];
             let resultHTML = '';
-            let resultObject = {};  // To store the stories for DOCX export
+            let resultObject = {};  // To store the stories for export
 
             // Show loading spinner and status message
             document.getElementById('loadingSpinner').style.display = 'block';
@@ -208,7 +211,7 @@
                     if (response.ok) {
                         const result = await response.json();
                         resultHTML += `<h3>${section.charAt(0).toUpperCase() + section.slice(1)}</h3><pre>${result.stories}</pre>`;
-                        resultObject[section] = result.stories;  // Store stories in object for DOCX export
+                        resultObject[section] = result.stories;  // Store stories in object for export
                         document.getElementById('result').innerHTML = resultHTML;
                     } else {
                         const error = await response.json();
@@ -238,26 +241,6 @@
             const content = document.getElementById('result').textContent;
             doc.text(content, 10, 10);
             doc.save("user_stories.pdf");
-        });
-
-        // Save as DOCX function
-        document.getElementById('saveDOCX').addEventListener('click', function() {
-            const docx = window.docx;
-            const doc = new docx.Document();
-
-            const content = document.getElementById('result').innerText.split("\n");
-            const paragraphs = content.map(line => new docx.Paragraph(line));
-
-            doc.addSection({
-                children: paragraphs
-            });
-
-            docx.Packer.toBlob(doc).then(blob => {
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = "user_stories.docx";
-                link.click();
-            });
         });
     </script>
 </body>
