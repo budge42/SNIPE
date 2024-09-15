@@ -33,7 +33,7 @@ export default async function handler(req, res) {
                     { role: "system", content: "You are a ServiceNow CSM implementation expert." },
                     { role: "user", content: prompt }
                 ],
-                max_tokens: 4200,
+                max_tokens: 4000,
                 temperature: 0.7,
             });
 
