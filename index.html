@@ -4,23 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSM Implementation Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #f4f7fa;
         }
         .container {
             width: 50%;
             margin: 50px auto;
             background: #fff;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
         }
         h1 {
             text-align: center;
+            font-size: 28px;
+            color: #333;
+            font-weight: 600;
         }
         form {
             margin-top: 20px;
@@ -28,32 +33,57 @@
         label {
             display: block;
             margin-bottom: 10px;
-            font-weight: bold;
+            font-weight: 500;
+            color: #555;
         }
-        input, select, textarea {
+        textarea, input {
             width: 100%;
-            padding: 10px;
+            padding: 15px;
             margin-bottom: 20px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        textarea:focus, input:focus {
+            border-color: #007bff;
         }
         button {
             width: 100%;
-            padding: 10px;
-            background-color: #28a745;
+            padding: 15px;
+            background-color: #007bff;
             color: white;
+            font-size: 18px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         button:hover {
-            background-color: #218838;
+            background-color: #0056b3;
         }
         .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f0f8ff;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9f7fe;
+            border-left: 4px solid #007bff;
             border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: 'Poppins', sans-serif;
+        }
+        .spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -62,20 +92,21 @@
         <h1>Customer Service Management (CSM) Questionnaire</h1>
         <form id="csmForm">
             <label for="goal">What are the main goals for your CSM implementation?</label>
-            <textarea id="goal" name="goal" required></textarea>
-            
+            <textarea id="goal" name="goal" rows="4" required></textarea>
+
             <label for="teams">Which departments or teams will be using CSM?</label>
-            <textarea id="teams" name="teams" required></textarea>
-            
+            <textarea id="teams" name="teams" rows="4" required></textarea>
+
             <label for="issues">What are the most common customer issues or requests?</label>
-            <textarea id="issues" name="issues" required></textarea>
-            
+            <textarea id="issues" name="issues" rows="4" required></textarea>
+
             <label for="integration">Do you have any existing systems or tools to integrate?</label>
-            <textarea id="integration" name="integration"></textarea>
-            
+            <textarea id="integration" name="integration" rows="4"></textarea>
+
             <button type="submit">Generate User Stories</button>
         </form>
 
+        <div class="spinner" id="loadingSpinner"></div>
         <div id="result" class="result"></div>
     </div>
 
@@ -89,6 +120,10 @@
             const sections = ['goal', 'teams', 'issues', 'integration'];
             let resultHTML = '';
 
+            // Show loading spinner
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('result').innerHTML = '';
+
             // Function to send the request for each section
             const generateStoriesForSection = async (section) => {
                 const response = await fetch('/api/generate-stories', {
@@ -101,7 +136,7 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    resultHTML += `<h3>${section}</h3><pre>${result.stories}</pre>`;
+                    resultHTML += `<h3 style="font-weight:600;color:#007bff;">${section}</h3><pre>${result.stories}</pre>`;
                     document.getElementById('result').innerHTML = resultHTML;
                 } else {
                     const error = await response.json();
@@ -113,6 +148,9 @@
             for (const section of sections) {
                 await generateStoriesForSection(section);
             }
+
+            // Hide the loading spinner
+            document.getElementById('loadingSpinner').style.display = 'none';
         });
     </script>
 </body>
