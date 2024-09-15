@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSM Implementation Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Customer Service Management (CSM) Questionnaire</h1>
+        <form id="csmForm">
+            <label for="goal">What are the main goals for your CSM implementation?</label>
+            <textarea id="goal" name="goal" required></textarea>
+            
+            <label for="teams">Which departments or teams will be using CSM?</label>
+            <textarea id="teams" name="teams" required></textarea>
+            
+            <label for="issues">What are the most common customer issues or requests?</label>
+            <textarea id="issues" name="issues" required></textarea>
+            
+            <label for="integration">Do you have any existing systems or tools to integrate?</label>
+            <textarea id="integration" name="integration"></textarea>
+            
+            <!-- Add more questions similarly -->
+            
+            <button type="submit">Generate User Stories</button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('csmForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            // Gather form data
+            const formData = new FormData(event.target);
+            const formObject = Object.fromEntries(formData.entries());
+
+            // Display loading message
+            document.getElementById('result').innerHTML = 'Generating user stories and acceptance criteria...';
+
+            // Send data to the backend
+            try {
+                const response = await fetch('/api/generate-stories', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formObject),
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById('result').innerHTML = `<pre>${result.stories}</pre>`;
+                } else {
+                    document.getElementById('result').innerHTML = 'Error generating stories.';
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = 'Error connecting to the server.';
+            }
+        });
+    </script>
+</body>
+</html>
